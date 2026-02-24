@@ -1,0 +1,56 @@
+
+> hr-management-backend@1.0.0 test
+> jest src/tests/auth.test.ts
+
+  console.error
+    Register failed: 500 {} <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <title>Error</title>
+    </head>
+    <body>
+    <pre>TypeError: models_1.Company.findOne is not a function<br> &nbsp; &nbsp;at C:\Users\prati\Downloads\hr saas files\hr-management-system\backend\src\controllers\authController.ts:52:43<br> &nbsp; &nbsp;at processTicksAndRejections (node:internal/process/task_queues:103:5)</pre>
+    </body>
+    </html>
+
+    [0m [90m 62 |[39m
+     [90m 63 |[39m             [36mif[39m (res[33m.[39mstatus [33m!==[39m [35m201[39m) {
+    [31m[1m>[22m[39m[90m 64 |[39m                 console[33m.[39merror([32m'Register failed:'[39m[33m,[39m res[33m.[39mstatus[33m,[39m res[33m.[39mbody[33m,[39m res[33m.[39mtext)[33m;[39m
+     [90m    |[39m                         [31m[1m^[22m[39m
+     [90m 65 |[39m             }
+     [90m 66 |[39m
+     [90m 67 |[39m             expect(res[33m.[39mstatus)[33m.[39mtoBe([35m201[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (src/tests/auth.test.ts:64:25)
+
+FAIL src/tests/auth.test.ts
+  Auth Routes
+    POST /api/v1/auth/register
+      ├ù should register a new company and admin successfully (73 ms)
+      ΓêÜ should return 400 if user already exists (8 ms)
+    POST /api/v1/auth/login
+      ΓêÜ should login successfully with correct credentials (18 ms)
+
+  ΓùÅ Auth Routes ΓÇ║ POST /api/v1/auth/register ΓÇ║ should register a new company and admin successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+      65 |             }
+      66 |
+    > 67 |             expect(res.status).toBe(201);
+         |                                ^
+      68 |             expect(res.body.success).toBe(true);
+      69 |             expect(Company.create).toHaveBeenCalled();
+      70 |             expect(User.create).toHaveBeenCalled();
+
+      at Object.<anonymous> (src/tests/auth.test.ts:67:32)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 2 passed, 3 total
+Snapshots:   0 total
+Time:        2.188 s, estimated 3 s
+Ran all test suites matching src/tests/auth.test.ts.

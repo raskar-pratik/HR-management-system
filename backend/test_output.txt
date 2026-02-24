@@ -1,0 +1,51 @@
+
+> hr-management-backend@1.0.0 test
+> jest src/tests/auth.test.ts
+
+FAIL src/tests/auth.test.ts
+  Auth Routes
+    POST /api/v1/auth/register
+      ├ù should register a new company and admin successfully (113 ms)
+      ├ù should return 400 if user already exists (11 ms)
+    POST /api/v1/auth/login
+      ΓêÜ should login successfully with correct credentials (20 ms)
+
+  ΓùÅ Auth Routes ΓÇ║ POST /api/v1/auth/register ΓÇ║ should register a new company and admin successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 500
+
+      61 |                 .send(validRegisterData);
+      62 |
+    > 63 |             expect(res.status).toBe(201);
+         |                                ^
+      64 |             expect(res.body.success).toBe(true);
+      65 |             expect(Company.create).toHaveBeenCalled();
+      66 |             expect(User.create).toHaveBeenCalled();
+
+      at Object.<anonymous> (src/tests/auth.test.ts:63:32)
+
+  ΓùÅ Auth Routes ΓÇ║ POST /api/v1/auth/register ΓÇ║ should return 400 if user already exists
+
+    expect(received).toContain(expected) // indexOf
+
+    Expected substring: "already exists"
+    Received string:    "Email already registered"
+
+      76 |             expect(res.status).toBe(400);
+      77 |             expect(res.body.success).toBe(false);
+    > 78 |             expect(res.body.message).toContain('already exists');
+         |                                      ^
+      79 |         });
+      80 |     });
+      81 |
+
+      at Object.<anonymous> (src/tests/auth.test.ts:78:38)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 1 passed, 3 total
+Snapshots:   0 total
+Time:        4.113 s
+Ran all test suites matching src/tests/auth.test.ts.

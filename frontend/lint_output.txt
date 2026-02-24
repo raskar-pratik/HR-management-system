@@ -1,0 +1,21 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\prati\Downloads\hr saas files\hr-management-system\frontend\src\pages\leaves\LeavesPage.tsx
+  210:18  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\prati\Downloads\hr saas files\hr-management-system\frontend\src\pages\payroll\PayrollPage.tsx
+  65:18  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\prati\Downloads\hr saas files\hr-management-system\frontend\src\pages\reports\ReportsPage.tsx
+   79:18  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  117:18  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  165:18  error  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\prati\Downloads\hr saas files\hr-management-system\frontend\src\services\api.ts
+  464:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 6 problems (6 errors, 0 warnings)
+
