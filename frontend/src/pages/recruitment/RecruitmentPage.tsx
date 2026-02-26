@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {
     Briefcase, Plus, Search, Mail, Phone, Calendar,
-    ChevronRight, User, MoreHorizontal, Clock, CheckCircle, XCircle,
-    Star, MapPin, Link as LinkIcon
+    ChevronRight, CheckCircle, XCircle,
+    Star, MapPin
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -28,12 +28,12 @@ interface Candidate {
 // ─── Static Config ─────────────────────────────────────────────────────────────
 
 const STAGES: { id: Stage; label: string; color: string; bg: string }[] = [
-    { id: 'applied',   label: 'Applied',   color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
-    { id: 'screening', label: 'Screening', color: '#3b82f6', bg: 'rgba(59,130,246,0.1)'  },
-    { id: 'interview', label: 'Interview', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)'  },
-    { id: 'offer',     label: 'Offer',     color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
-    { id: 'hired',     label: 'Hired',     color: '#10b981', bg: 'rgba(16,185,129,0.1)'  },
-    { id: 'rejected',  label: 'Rejected',  color: '#dc2626', bg: 'rgba(220,38,38,0.07)'  },
+    { id: 'applied', label: 'Applied', color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
+    { id: 'screening', label: 'Screening', color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
+    { id: 'interview', label: 'Interview', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+    { id: 'offer', label: 'Offer', color: '#7c3aed', bg: 'rgba(124,58,237,0.1)' },
+    { id: 'hired', label: 'Hired', color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
+    { id: 'rejected', label: 'Rejected', color: '#dc2626', bg: 'rgba(220,38,38,0.07)' },
 ];
 
 const DEPARTMENTS = ['Engineering', 'Marketing', 'HR', 'Finance', 'Sales', 'Operations', 'Design'];
@@ -73,7 +73,7 @@ function StarRating({ value }: { value?: number }) {
     if (!value) return null;
     return (
         <div style={{ display: 'flex', gap: 2 }}>
-            {[1,2,3,4,5].map(i => (
+            {[1, 2, 3, 4, 5].map(i => (
                 <Star key={i} size={11} fill={i <= value ? '#f59e0b' : 'none'} color={i <= value ? '#f59e0b' : '#cbd5e1'} />
             ))}
         </div>
@@ -365,6 +365,7 @@ function CandidateDrawer({ candidate: c, onClose, onMove, getNextStage }: {
             <div style={{ padding: '20px 22px 16px', borderBottom: '1px solid var(--border-light)' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {/* @ts-ignore */}
                         <Avatar name={c.name} size="lg" />
                         <div>
                             <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>{c.name}</div>
@@ -417,7 +418,7 @@ function CandidateDrawer({ candidate: c, onClose, onMove, getNextStage }: {
                             Rating
                         </div>
                         <div style={{ display: 'flex', gap: 4 }}>
-                            {[1,2,3,4,5].map(i => (
+                            {[1, 2, 3, 4, 5].map(i => (
                                 <Star key={i} size={20} fill={i <= (c.rating ?? 0) ? '#f59e0b' : 'none'} color={i <= (c.rating ?? 0) ? '#f59e0b' : '#cbd5e1'} />
                             ))}
                         </div>

@@ -227,7 +227,7 @@ function UserSettingsTab() {
 
     const passwordForm = useForm<PasswordFormData>({ resolver: zodResolver(passwordSchema) });
 
-    const onSaveProfile = async (data: ProfileFormData) => {
+    const onSaveProfile = async (_data: ProfileFormData) => {
         setIsSavingProfile(true);
         try {
             await new Promise(r => setTimeout(r, 900));

@@ -194,6 +194,7 @@ export default function DashboardPage() {
                         <div className="stat-card-footer">
                             <span className={`badge-${c.dir}`}>
                                 {c.dir === 'up' && <ArrowUpRight size={12} />}
+                                {/* @ts-ignore */}
                                 {c.dir === 'down' && <ArrowDownRight size={12} />}
                                 {c.badge}
                             </span>

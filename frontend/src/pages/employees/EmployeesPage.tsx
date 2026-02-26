@@ -8,7 +8,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import {
     Users, Plus, Search, Edit, Trash2,
-    ChevronLeft, ChevronRight, Eye, User, Mail, Calendar, Download, MoreHorizontal
+    ChevronLeft, ChevronRight, Eye, User, Mail, Calendar, Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';

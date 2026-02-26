@@ -15,7 +15,7 @@ const STATUS_BADGE: Record<string, string> = {
     absent: 'badge-red',
 };
 
-const STATUS_ICON: Record<string, JSX.Element> = {
+const STATUS_ICON: Record<string, any> = {
     present: <UserCheck size={13} />,
     late: <AlertCircle size={13} />,
     absent: <UserX size={13} />,

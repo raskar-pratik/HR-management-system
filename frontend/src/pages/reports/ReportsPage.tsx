@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-    FileText, Download, Filter, Calendar, Users, Clock,
+    Download, Filter, Calendar, Users, Clock,
     TrendingUp, Building, RefreshCw, UserCheck, UserX, AlertCircle, ChevronDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -37,8 +37,8 @@ interface EmployeeDirectoryData {
 }
 
 const MONTHS = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
 const REPORT_TABS: { id: ReportType; label: string; icon: React.ElementType }[] = [
@@ -88,7 +88,7 @@ export default function ReportsPage() {
     useEffect(() => {
         api.getDepartments()
             .then(r => setDepartments(r.data || []))
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const loadReport = useCallback(async () => {

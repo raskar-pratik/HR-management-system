@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Clock, Calendar,
-    Building2, LogOut, Menu, X, BarChart, Settings, Coins, HelpCircle,
+    Building2, LogOut, Menu, BarChart, Settings, Coins, HelpCircle,
     ChevronLeft
 } from 'lucide-react';
 import { useState } from 'react';
