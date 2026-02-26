@@ -40,7 +40,7 @@ const NETWORK_ERRORS: Record<string, string> = {
 
 // Create axios instance with defaults
 const apiClient: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://backend-production-d8f7.up.railway.app/api/v1',
+    baseURL: 'https://backend-production-d8f7.up.railway.app/api/v1',
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ apiClient.interceptors.response.use(
             if (refreshToken) {
                 try {
                     const response = await axios.post(
-                        `${import.meta.env.VITE_API_URL}/auth/refresh`,
+                        `https://backend-production-d8f7.up.railway.app/api/v1/auth/refresh`,
                         { refreshToken }
                     );
 
