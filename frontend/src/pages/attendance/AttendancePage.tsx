@@ -1,19 +1,31 @@
 import { useEffect, useState, useCallback } from 'react';
 import { AttendancePageSkeleton } from '../../components/Skeleton';
 import { EmptyState } from '../../components/EmptyState';
-import { Clock, Calendar, Download, ChevronLeft, ChevronRight, UserCheck, UserX, AlertCircle, TrendingUp } from 'lucide-react';
+import {
+    Clock, Calendar, Download, ChevronLeft, ChevronRight,
+    UserCheck, UserX, AlertCircle, TrendingUp
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
 import type { AttendanceRecord } from '../../services/api';
 
+const STATUS_BADGE: Record<string, string> = {
+    present: 'badge-green',
+    late: 'badge-amber',
+    absent: 'badge-red',
+};
+
+const STATUS_ICON: Record<string, JSX.Element> = {
+    present: <UserCheck size={13} />,
+    late: <AlertCircle size={13} />,
+    absent: <UserX size={13} />,
+};
+
 export default function AttendancePage() {
     const [report, setReport] = useState<AttendanceRecord[]>([]);
     const [summary, setSummary] = useState<{
-        present: number;
-        late: number;
-        absent: number;
-        totalHours: string;
-        avgHours: string | number;
+        present: number; late: number; absent: number;
+        totalHours: string; avgHours: string | number;
     } | null>(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [isLoading, setIsLoading] = useState(true);
@@ -28,118 +40,116 @@ export default function AttendancePage() {
                 startDate: startDate.toISOString().split('T')[0],
                 endDate: endDate.toISOString().split('T')[0],
             });
-            setReport(response.data || []);
 
-            const present = response.data.filter((r: AttendanceRecord) => r.status === 'present' || r.status === 'late').length;
-            const late = response.data.filter((r: AttendanceRecord) => r.status === 'late').length;
-            const totalHours = response.data.reduce((sum: number, r: AttendanceRecord) => sum + (r.workHours || 0), 0);
+            const records: AttendanceRecord[] = response.data || [];
+            setReport(records);
+
+            const present = records.filter(r => ['present', 'late'].includes(r.status)).length;
+            const late = records.filter(r => r.status === 'late').length;
+            const totalHoursNum = records.reduce((sum, r) => sum + (r.workHours || 0), 0);
 
             setSummary({
                 present,
                 late,
                 absent: endDate.getDate() - present,
-                totalHours: totalHours.toFixed(1),
-                avgHours: present > 0 ? (totalHours / present).toFixed(1) : 0,
+                totalHours: totalHoursNum.toFixed(1),
+                avgHours: present > 0 ? (totalHoursNum / present).toFixed(1) : 0,
             });
-        } catch (error) {
+        } catch {
             toast.error('Failed to load attendance');
-            console.error(error);
         } finally {
             setIsLoading(false);
         }
     }, [currentMonth]);
 
-    useEffect(() => {
-        loadAttendance();
-    }, [loadAttendance]);
+    useEffect(() => { loadAttendance(); }, [loadAttendance]);
 
-    const formatMonth = (date: Date) => {
-        return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const handleExport = async () => {
+        try { await api.exportAttendance(); }
+        catch { toast.error('Export failed'); }
     };
 
-    const prevMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-    };
+    const formatMonth = (d: Date) =>
+        d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-    const nextMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-    };
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'present': return <UserCheck size={16} className="text-green" />;
-            case 'late': return <AlertCircle size={16} className="text-orange" />;
-            case 'absent': return <UserX size={16} className="text-red" />;
-            default: return null;
-        }
-    };
+    const summaryCards = summary ? [
+        { label: 'Days Present', value: summary.present, icon: UserCheck, color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
+        { label: 'Days Late', value: summary.late, icon: AlertCircle, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+        { label: 'Total Hours', value: `${summary.totalHours}h`, icon: Clock, color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
+        { label: 'Avg. Hours/Day', value: `${summary.avgHours}h`, icon: TrendingUp, color: '#7c3aed', bg: 'rgba(124,58,237,0.1)' },
+    ] : [];
 
     return (
-        <div className="attendance-page">
+        <div className="page-wrapper">
+            {/* Header */}
             <div className="page-header">
-                <div className="header-left">
-                    <Clock size={32} className="page-icon" />
-                    <div>
-                        <h1>Attendance Report</h1>
-                        <p>Track your work hours</p>
-                    </div>
+                <div>
+                    <h1 className="page-title">Attendance</h1>
+                    <p className="page-subtitle">Track your monthly work hours and attendance</p>
                 </div>
-                <button className="btn-secondary">
-                    <Download size={20} />
-                    Export
+                <div className="page-actions">
+                    <button className="btn btn-secondary" onClick={handleExport}>
+                        <Download size={15} />
+                        Export PDF
+                    </button>
+                </div>
+            </div>
+
+            {/* Month Navigator */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                marginBottom: 24,
+                background: 'var(--bg-white)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '12px 20px',
+                boxShadow: 'var(--shadow-xs)',
+                width: 'fit-content',
+            }}>
+                <button
+                    className="btn btn-ghost btn-sm btn-icon-only"
+                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+                >
+                    <ChevronLeft size={16} />
+                </button>
+                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', minWidth: 160, textAlign: 'center' }}>
+                    {formatMonth(currentMonth)}
+                </span>
+                <button
+                    className="btn btn-ghost btn-sm btn-icon-only"
+                    onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                >
+                    <ChevronRight size={16} />
                 </button>
             </div>
 
-            <div className="month-nav">
-                <button onClick={prevMonth}>
-                    <ChevronLeft size={24} />
-                </button>
-                <h2>{formatMonth(currentMonth)}</h2>
-                <button onClick={nextMonth}>
-                    <ChevronRight size={24} />
-                </button>
-            </div>
-
+            {/* Summary Cards */}
             {summary && (
-                <div className="summary-grid">
-                    <div className="summary-card green">
-                        <UserCheck size={24} />
-                        <div>
-                            <h3>{summary.present}</h3>
-                            <p>Days Present</p>
+                <div className="stat-cards-grid" style={{ marginBottom: 24 }}>
+                    {summaryCards.map(c => (
+                        <div className="stat-card" key={c.label}>
+                            <div className="stat-card-header">
+                                <span className="stat-card-label">{c.label}</span>
+                                <div className="stat-card-icon" style={{ background: c.bg }}>
+                                    <c.icon size={18} color={c.color} />
+                                </div>
+                            </div>
+                            <div className="stat-card-value">{c.value}</div>
                         </div>
-                    </div>
-                    <div className="summary-card orange">
-                        <AlertCircle size={24} />
-                        <div>
-                            <h3>{summary.late}</h3>
-                            <p>Days Late</p>
-                        </div>
-                    </div>
-                    <div className="summary-card blue">
-                        <Clock size={24} />
-                        <div>
-                            <h3>{summary.totalHours}h</h3>
-                            <p>Total Hours</p>
-                        </div>
-                    </div>
-                    <div className="summary-card purple">
-                        <TrendingUp size={24} />
-                        <div>
-                            <h3>{summary.avgHours}h</h3>
-                            <p>Avg. Hours/Day</p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             )}
 
-            <div className="table-container">
+            {/* Table */}
+            <div className="table-wrapper">
                 {isLoading ? (
                     <AttendancePageSkeleton />
                 ) : report.length === 0 ? (
                     <EmptyState
                         title="No attendance records"
-                        description="No attendance records found for this period."
+                        description="No records found for this period."
                         icon={Calendar}
                     />
                 ) : (
@@ -155,19 +165,35 @@ export default function AttendancePage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {report.map((record) => {
+                            {report.map(record => {
                                 const date = new Date(record.date);
+                                const statusClass = STATUS_BADGE[record.status] || 'badge-gray';
+                                const isWeekend = [0, 6].includes(date.getDay());
+
                                 return (
-                                    <tr key={record.id}>
-                                        <td>{date.toLocaleDateString()}</td>
-                                        <td>{date.toLocaleDateString('en-US', { weekday: 'short' })}</td>
-                                        <td>{record.clockIn || '-'}</td>
-                                        <td>{record.clockOut || '-'}</td>
-                                        <td>{record.workHours ? `${record.workHours.toFixed(1)}h` : '-'}</td>
+                                    <tr key={record.id} style={isWeekend ? { opacity: 0.55 } : {}}>
+                                        <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                                            {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                        </td>
+                                        <td style={{ color: 'var(--text-muted)' }}>
+                                            {date.toLocaleDateString('en-US', { weekday: 'long' })}
+                                        </td>
+                                        <td style={{ fontFamily: 'monospace', fontSize: 13 }}>
+                                            {record.clockIn || <span style={{ color: 'var(--text-light)' }}>—</span>}
+                                        </td>
+                                        <td style={{ fontFamily: 'monospace', fontSize: 13 }}>
+                                            {record.clockOut || <span style={{ color: 'var(--text-light)' }}>—</span>}
+                                        </td>
                                         <td>
-                                            <span className={`status-badge ${record.status}`}>
-                                                {getStatusIcon(record.status)}
-                                                {record.status}
+                                            {record.workHours
+                                                ? <span style={{ fontWeight: 600 }}>{record.workHours.toFixed(1)}h</span>
+                                                : <span style={{ color: 'var(--text-light)' }}>—</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span className={`badge ${statusClass}`}>
+                                                {STATUS_ICON[record.status]}
+                                                {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
                                             </span>
                                         </td>
                                     </tr>

@@ -3,32 +3,39 @@ import { PayrollPageSkeleton } from '../../components/Skeleton';
 import { EmptyState } from '../../components/EmptyState';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import {
-    Coins,
-    FileText,
-    Users,
-    Play,
-    Plus,
-    Download,
-    CreditCard
+    Coins, FileText, Users, Play, Plus,
+    Download, CreditCard, ChevronDown, Loader2
 } from 'lucide-react';
 import api from '../../services/api';
-import type {
-    SalaryComponent,
-    PayrollRun,
-    Payslip
-} from '../../services/api';
+import type { SalaryComponent, PayrollRun, Payslip } from '../../services/api';
 import toast from 'react-hot-toast';
 
-export default function PayrollPage() {
-    const [activeTab, setActiveTab] = useState<'components' | 'structures' | 'process' | 'payslips'>('payslips');
-    const [isLoading, setIsLoading] = useState(false);
+const MONTHS = [
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
+];
 
-    // Data States
+const TABS = [
+    { id: 'payslips', label: 'Payslips', icon: FileText },
+    { id: 'process', label: 'Run Payroll', icon: Play },
+    { id: 'components', label: 'Salary Components', icon: CreditCard },
+    { id: 'structures', label: 'Structures', icon: Users },
+] as const;
+type TabId = typeof TABS[number]['id'];
+
+const RUN_STATUS: Record<string, string> = {
+    completed: 'badge-green', processing: 'badge-amber',
+    failed: 'badge-red', pending: 'badge-gray',
+};
+
+const fmt = (v: number | string) => `₹${Number(v).toLocaleString('en-IN')}`;
+
+export default function PayrollPage() {
+    const [activeTab, setActiveTab] = useState<TabId>('payslips');
+    const [isLoading, setIsLoading] = useState(false);
     const [components, setComponents] = useState<SalaryComponent[]>([]);
     const [runs, setRuns] = useState<PayrollRun[]>([]);
     const [payslips, setPayslips] = useState<Payslip[]>([]);
-
-    // Process State
     const [processMonth, setProcessMonth] = useState(new Date().getMonth() + 1);
     const [processYear, setProcessYear] = useState(new Date().getFullYear());
     const [showProcessModal, setShowProcessModal] = useState(false);
@@ -37,281 +44,255 @@ export default function PayrollPage() {
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            if (activeTab === 'components') {
-                const res = await api.getSalaryComponents();
-                setComponents(res.data || []);
-            } else if (activeTab === 'process') {
-                const res = await api.getPayrollRuns();
-                setRuns(res.data || []);
-            } else if (activeTab === 'payslips') {
-                const res = await api.getPayslips();
-                setPayslips(res.data || []);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
+            if (activeTab === 'components') setComponents((await api.getSalaryComponents()).data || []);
+            else if (activeTab === 'process') setRuns((await api.getPayrollRuns()).data || []);
+            else if (activeTab === 'payslips') setPayslips((await api.getPayslips()).data || []);
+        } catch { toast.error('Failed to load data'); }
+        finally { setIsLoading(false); }
     }, [activeTab]);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    const handleProcessClick = () => {
-        if (!processMonth || !processYear) return;
-        setShowProcessModal(true);
-    };
+    useEffect(() => { fetchData(); }, [fetchData]);
 
     const confirmProcess = async () => {
         setIsProcessing(true);
         try {
             await api.processPayroll({ month: processMonth, year: processYear });
-            toast.success('Payroll processing started in background');
+            toast.success(`Payroll for ${MONTHS[processMonth - 1]} ${processYear} started!`);
             setShowProcessModal(false);
             fetchData();
-        } catch {
-            toast.error('Failed to start payroll process');
-        } finally {
-            setIsProcessing(false);
-        }
+        } catch { toast.error('Failed to start payroll process'); }
+        finally { setIsProcessing(false); }
     };
 
-    if (isLoading && activeTab !== 'process') {
-        return <PayrollPageSkeleton />;
-    }
-
-    const renderComponentsTab = () => (
-        <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold">Salary Components</h3>
-                <button className="btn btn-primary flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                    <Plus size={16} className="mr-2" />
-                    Add Component
-                </button>
-            </div>
-            <div className="overflow-x-auto">
-                {components.length === 0 ? (
-                    <EmptyState
-                        title="No salary components"
-                        description="Define earnings and deductions for your salary structures."
-                        icon={CreditCard}
-                    />
-                ) : (
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Calculation</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {components.map((c) => (
-                                <tr key={c.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">{c.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap"><span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">{c.code}</span></td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${c.type === 'earning' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                            {c.type}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {c.calculationType} {c.percentageOf ? `of ${c.percentageOf}` : ''}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${c.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                            {c.isActive ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
-        </div>
-    );
-
-    const renderProcessTab = () => (
-        <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold mb-4">Run Payroll</h3>
-                <div className="flex gap-4 items-end">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
-                        <select
-                            value={processMonth}
-                            onChange={(e) => setProcessMonth(Number(e.target.value))}
-                            className="block w-32 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                        >
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                                <option key={m} value={m}>{new Date(0, m - 1).toLocaleString('default', { month: 'long' })}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                        <input
-                            type="number"
-                            value={processYear}
-                            onChange={(e) => setProcessYear(Number(e.target.value))}
-                            className="block w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        />
-                    </div>
-                    <button
-                        onClick={handleProcessClick}
-                        disabled={isLoading || isProcessing}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 flex items-center"
-                    >
-                        {isLoading ? 'Processing...' : <><Play size={16} className="mr-2" /> Process Payroll</>}
-                    </button>
+    return (
+        <div className="page-wrapper">
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title">Payroll</h1>
+                    <p className="page-subtitle">Manage salary components, run payroll and download payslips</p>
+                </div>
+                <div className="page-actions">
+                    {activeTab === 'components' && (
+                        <button className="btn btn-primary"><Plus size={15} /> Add Component</button>
+                    )}
+                    {activeTab === 'process' && (
+                        <button className="btn btn-primary" onClick={() => setShowProcessModal(true)}>
+                            <Play size={15} /> Run Payroll
+                        </button>
+                    )}
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold mb-4">Recent Payroll Runs</h3>
-                {runs.length === 0 ? (
-                    <EmptyState
-                        title="No payroll history"
-                        description="Process your first payroll run to see history here."
-                        icon={Coins}
-                    />
-                ) : (
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employees</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Net Pay</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Processed On</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {runs.map((r) => (
-                                <tr key={r.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium">{new Date(0, r.month - 1).toLocaleString('default', { month: 'short' })} {r.year}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${r.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                            {r.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{r.employeeCount}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${Number(r.totalNet).toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(r.processedAt).toLocaleDateString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Pill Tabs */}
+            <div style={{
+                display: 'flex', gap: 4, background: 'var(--bg-subtle)',
+                padding: 4, borderRadius: 'var(--radius-lg)', width: 'fit-content', marginBottom: 24,
+            }}>
+                {TABS.map(tab => (
+                    <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+                        display: 'flex', alignItems: 'center', gap: 7,
+                        padding: '8px 16px', borderRadius: 'var(--radius)',
+                        border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                        fontFamily: 'inherit',
+                        background: activeTab === tab.id ? 'var(--bg-white)' : 'transparent',
+                        color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-muted)',
+                        boxShadow: activeTab === tab.id ? 'var(--shadow-sm)' : 'none',
+                        transition: 'all 0.15s',
+                    }}>
+                        <tab.icon size={14} />{tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {isLoading && activeTab !== 'process' ? <PayrollPageSkeleton /> : (<>
+
+                {/* PAYSLIPS */}
+                {activeTab === 'payslips' && (
+                    <div className="table-wrapper">
+                        {payslips.length === 0 ? (
+                            <EmptyState title="No payslips" description="Process payroll to generate payslips." icon={FileText} />
+                        ) : (
+                            <table className="data-table">
+                                <thead><tr>
+                                    <th>Employee</th><th>Period</th>
+                                    <th>Gross</th><th>Deductions</th><th>Net Pay</th>
+                                    <th>Status</th><th style={{ textAlign: 'right' }}>PDF</th>
+                                </tr></thead>
+                                <tbody>
+                                    {payslips.map(p => (
+                                        <tr key={p.id}>
+                                            <td>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                                                        {p.employee?.user?.name ?? '—'}
+                                                    </span>
+                                                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                                                        {p.employee?.employeeCode}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td style={{ fontWeight: 600 }}>{MONTHS[p.month - 1]} {p.year}</td>
+                                            <td style={{ color: 'var(--green)', fontWeight: 600 }}>{fmt(p.grossEarnings)}</td>
+                                            <td style={{ color: 'var(--red)' }}>−{fmt(p.totalDeductions)}</td>
+                                            <td style={{ fontWeight: 800, fontSize: 15 }}>{fmt(p.netPay)}</td>
+                                            <td><span className="badge badge-green"><span className="badge-dot" />{p.status ?? 'Generated'}</span></td>
+                                            <td style={{ textAlign: 'right' }}>
+                                                <button className="btn btn-ghost btn-sm btn-icon-only"><Download size={15} /></button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
                 )}
-            </div>
-        </div>
-    );
 
-    const renderPayslipsTab = () => (
-        <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Payslips</h3>
-            <div className="overflow-x-auto">
-                {payslips.length === 0 ? (
-                    <EmptyState
-                        title="No payslips generated"
-                        description="Process payroll to generate payslips for employees."
-                        icon={FileText}
-                    />
-                ) : (
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gross</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deductions</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net Pay</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {payslips.map((p) => (
-                                <tr key={p.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="ml-0">
-                                                <div className="text-sm font-medium text-gray-900">{p.employee?.user.name}</div>
-                                                <div className="text-sm text-gray-500">{p.employee?.employeeCode}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{new Date(0, p.month - 1).toLocaleString('default', { month: 'short' })} {p.year}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${Number(p.grossEarnings).toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500">-${Number(p.totalDeductions).toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${Number(p.netPay).toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            {p.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button className="text-indigo-600 hover:text-indigo-900"><Download size={16} /></button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                {/* RUN PAYROLL */}
+                {activeTab === 'process' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                        <div className="card card-padded">
+                            <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 16 }}>Process New Payroll Run</h3>
+                            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label className="form-label">Month</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <select className="form-input" value={processMonth}
+                                            onChange={e => setProcessMonth(Number(e.target.value))}
+                                            style={{ appearance: 'none', paddingRight: 36, width: 160 }}>
+                                            {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
+                                        </select>
+                                        <ChevronDown size={14} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
+                                    </div>
+                                </div>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label className="form-label">Year</label>
+                                    <input type="number" className="form-input" value={processYear}
+                                        onChange={e => setProcessYear(Number(e.target.value))}
+                                        style={{ width: 100 }} />
+                                </div>
+                                <button className="btn btn-primary" onClick={() => setShowProcessModal(true)}
+                                    disabled={isProcessing} style={{ alignSelf: 'flex-end' }}>
+                                    {isProcessing
+                                        ? <><Loader2 size={15} className="spinner" /> Processing…</>
+                                        : <><Play size={15} /> Process Payroll</>}
+                                </button>
+                            </div>
+                            <div style={{
+                                marginTop: 14, padding: '11px 14px',
+                                background: 'var(--amber-light)', borderRadius: 'var(--radius)',
+                                fontSize: 13, color: '#78350f', fontWeight: 500,
+                            }}>
+                                ⚠️ This will generate payslips for <strong>all active employees</strong>. Action cannot be undone.
+                            </div>
+                        </div>
+
+                        <div className="table-wrapper">
+                            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--border-light)' }}>
+                                <span style={{ fontSize: 14, fontWeight: 700 }}>Payroll History</span>
+                            </div>
+                            {isLoading ? (
+                                <div style={{ padding: 40, textAlign: 'center' }}>
+                                    <Loader2 size={20} className="spinner" style={{ display: 'inline-block', color: 'var(--text-light)' }} />
+                                </div>
+                            ) : runs.length === 0 ? (
+                                <EmptyState title="No payroll history" description="Process your first payroll to see history." icon={Coins} />
+                            ) : (
+                                <table className="data-table">
+                                    <thead><tr>
+                                        <th>Period</th><th>Status</th><th>Employees</th>
+                                        <th>Total Net Pay</th><th>Processed On</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        {runs.map(r => (
+                                            <tr key={r.id}>
+                                                <td style={{ fontWeight: 700 }}>{MONTHS[r.month - 1]} {r.year}</td>
+                                                <td>
+                                                    <span className={`badge ${RUN_STATUS[r.status] || 'badge-gray'}`}>
+                                                        <span className="badge-dot" />
+                                                        {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td>{r.employeeCount}</td>
+                                                <td style={{ fontWeight: 700 }}>{fmt(r.totalNet)}</td>
+                                                <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                                                    {r.processedAt ? new Date(r.processedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
                 )}
-            </div>
-        </div>
-    );
 
-    return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                    <Coins className="mr-3 text-yellow-500" />
-                    Payroll Management
-                </h1>
-                <p className="mt-1 text-sm text-gray-500">
-                    Manage salary components, payroll processing, and employee payslips
-                </p>
-            </div>
+                {/* COMPONENTS */}
+                {activeTab === 'components' && (
+                    <div className="table-wrapper">
+                        {components.length === 0 ? (
+                            <EmptyState title="No salary components" description="Define earnings and deductions for your salary structures." icon={CreditCard} />
+                        ) : (
+                            <table className="data-table">
+                                <thead><tr>
+                                    <th>Name</th><th>Code</th><th>Type</th><th>Calculation</th><th>Status</th>
+                                </tr></thead>
+                                <tbody>
+                                    {components.map(c => (
+                                        <tr key={c.id}>
+                                            <td style={{ fontWeight: 600 }}>{c.name}</td>
+                                            <td>
+                                                <code style={{
+                                                    background: 'var(--bg-subtle)', padding: '3px 8px',
+                                                    borderRadius: 6, fontSize: 12, fontFamily: 'monospace',
+                                                    color: 'var(--primary)', fontWeight: 600,
+                                                }}>{c.code}</code>
+                                            </td>
+                                            <td>
+                                                <span className={`badge ${c.type === 'earning' ? 'badge-green' : 'badge-red'}`}>
+                                                    {c.type === 'earning' ? '+ Earning' : '− Deduction'}
+                                                </span>
+                                            </td>
+                                            <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                                                {c.calculationType}{c.percentageOf && ` of ${c.percentageOf}`}
+                                            </td>
+                                            <td>
+                                                <span className={`badge ${c.isActive ? 'badge-green' : 'badge-gray'}`}>
+                                                    <span className="badge-dot" />
+                                                    {c.isActive ? 'Active' : 'Inactive'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                )}
 
-            <div className="border-b border-gray-200 mb-6">
-                <nav className="-mb-px flex space-x-8">
-                    {[
-                        { id: 'payslips', name: 'Payslips', icon: FileText },
-                        { id: 'process', name: 'Process Payroll', icon: Play },
-                        { id: 'structures', name: 'Salary Structures', icon: Users },
-                        { id: 'components', name: 'Salary Components', icon: CreditCard },
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                            className={`${activeTab === tab.id
-                                ? 'border-indigo-500 text-indigo-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-                        >
-                            <tab.icon className="mr-2 h-4 w-4" />
-                            {tab.name}
-                        </button>
-                    ))}
-                </nav>
-            </div>
-
-            {activeTab === 'components' && renderComponentsTab()}
-            {activeTab === 'process' && renderProcessTab()}
-            {activeTab === 'payslips' && renderPayslipsTab()}
-            {activeTab === 'structures' && <div className="bg-white p-6 rounded-lg shadow text-center text-gray-500">Select an employee to view/edit salary structure (Coming Soon)</div>}
+                {/* STRUCTURES */}
+                {activeTab === 'structures' && (
+                    <div className="card card-padded" style={{ textAlign: 'center', padding: '60px 40px' }}>
+                        <div style={{
+                            width: 56, height: 56, borderRadius: '50%',
+                            background: 'var(--primary-light)', margin: '0 auto 14px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)',
+                        }}>
+                            <Users size={24} />
+                        </div>
+                        <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Salary Structures</h3>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 300, margin: '0 auto' }}>
+                            Open an employee's profile from the Employees page to assign or edit their salary structure.
+                        </p>
+                    </div>
+                )}
+            </>)}
 
             <ConfirmationModal
                 isOpen={showProcessModal}
                 onClose={() => setShowProcessModal(false)}
                 onConfirm={confirmProcess}
-                title="Process Payroll"
-                message={`Are you sure you want to process payroll for ${new Date(0, processMonth - 1).toLocaleString('default', { month: 'long' })} ${processYear}? This will generate payslips for all active employees.`}
+                title="Confirm Payroll Run"
+                message={`Process payroll for ${MONTHS[processMonth - 1]} ${processYear}? Payslips will be generated for all active employees.`}
                 confirmLabel="Start Processing"
                 variant="warning"
                 isLoading={isProcessing}

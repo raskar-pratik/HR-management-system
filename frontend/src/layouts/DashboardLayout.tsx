@@ -1,14 +1,58 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, Users, Clock, Calendar,
-    Building2, LogOut, Menu, X, BarChart, Settings, Coins
+    Building2, LogOut, Menu, X, BarChart, Settings, Coins, HelpCircle,
+    ChevronLeft
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
+const NAV_MAIN = [
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    {
+        to: '/employees', icon: Users, label: 'Employees',
+        roles: ['super_admin', 'company_admin', 'hr_manager', 'manager']
+    },
+    { to: '/attendance', icon: Clock, label: 'Attendance' },
+    { to: '/leaves', icon: Calendar, label: 'Leaves' },
+    {
+        to: '/departments', icon: Building2, label: 'Departments',
+        roles: ['super_admin', 'company_admin', 'hr_manager', 'manager']
+    },
+    {
+        to: '/reports', icon: BarChart, label: 'Reports',
+        roles: ['super_admin', 'company_admin', 'hr_manager', 'manager']
+    },
+    {
+        to: '/payroll', icon: Coins, label: 'Payroll',
+        roles: ['super_admin', 'company_admin', 'hr_manager']
+    },
+];
+
+const NAV_SYSTEM = [
+    {
+        to: '/settings', icon: Settings, label: 'Settings',
+        roles: ['super_admin', 'company_admin']
+    },
+    { to: '/help', icon: HelpCircle, label: 'Help Center' },
+];
+
+function getAvatarColor(name: string): string {
+    const colors = [
+        'linear-gradient(135deg,#0d968b,#065f5a)',
+        'linear-gradient(135deg,#7c3aed,#5b21b6)',
+        'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+        'linear-gradient(135deg,#10b981,#059669)',
+        'linear-gradient(135deg,#f59e0b,#d97706)',
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return colors[Math.abs(hash) % colors.length];
+}
+
 export default function DashboardLayout() {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [collapsed, setCollapsed] = useState(false);
     const user = useAuthStore((state) => state.user);
     const logout = useAuthStore((state) => state.logout);
     const navigate = useNavigate();
@@ -19,90 +63,95 @@ export default function DashboardLayout() {
         navigate('/login');
     };
 
-    const navItems = [
-        { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        {
-            to: '/employees',
-            icon: Users,
-            label: 'Employees',
-            roles: ['super_admin', 'company_admin', 'hr_manager', 'manager']
-        },
-        { to: '/attendance', icon: Clock, label: 'Attendance' },
-        { to: '/leaves', icon: Calendar, label: 'Leaves' },
-        {
-            to: '/departments',
-            icon: Building2,
-            label: 'Departments',
-            roles: ['super_admin', 'company_admin', 'hr_manager', 'manager']
-        },
-        {
-            to: '/reports',
-            icon: BarChart,
-            label: 'Reports',
-            roles: ['super_admin', 'company_admin', 'hr_manager', 'manager']
-        },
-        {
-            to: '/payroll',
-            icon: Coins,
-            label: 'Payroll',
-            roles: ['super_admin', 'company_admin', 'hr_manager']
-        },
-        {
-            to: '/settings',
-            icon: Settings,
-            label: 'Settings',
-            roles: ['super_admin', 'company_admin']
-        }
-    ];
+    const filterNav = (items: typeof NAV_MAIN) =>
+        items.filter(item => !item.roles || (user && item.roles.includes(user.role)));
 
-    const filteredNavItems = navItems.filter(item => {
-        if (!item.roles) return true;
-        return user && item.roles.includes(user.role);
-    });
+    const fullName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim();
+    const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`;
+    const avatarBg = getAvatarColor(fullName);
 
     return (
-        <div className={`dashboard-layout ${sidebarOpen ? '' : 'sidebar-collapsed'}`}>
-            {/* Sidebar */}
+        <div className={`dashboard-layout${collapsed ? ' sidebar-collapsed' : ''}`}>
             <aside className="sidebar">
-                <div className="sidebar-header">
-                    <div className="logo-section">
-                        <span className="logo-icon">👥</span>
-                        {sidebarOpen && <span className="logo-text">HR System</span>}
+                {/* Logo */}
+                <div className="sidebar-logo">
+                    <div className="sidebar-logo-icon">
+                        <Users size={20} />
                     </div>
-                    <button className="toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                    {!collapsed && (
+                        <span className="sidebar-logo-text">
+                            People<span>OS</span>
+                        </span>
+                    )}
+                    <button
+                        className="sidebar-toggle"
+                        onClick={() => setCollapsed(c => !c)}
+                        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                    >
+                        {collapsed ? <Menu size={14} /> : <ChevronLeft size={14} />}
                     </button>
                 </div>
 
                 <nav className="sidebar-nav">
-                    {filteredNavItems.map((item) => (
-                        <NavLink key={item.to} to={item.to} className="nav-item">
-                            <item.icon size={22} />
-                            {sidebarOpen && <span>{item.label}</span>}
+                    {!collapsed && <div className="sidebar-section-label">Main Menu</div>}
+
+                    {filterNav(NAV_MAIN).map(item => (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+                            title={collapsed ? item.label : undefined}
+                        >
+                            <item.icon size={18} />
+                            {!collapsed && <span>{item.label}</span>}
+                        </NavLink>
+                    ))}
+
+                    {!collapsed && <div className="sidebar-section-label" style={{ marginTop: 8 }}>System</div>}
+                    {collapsed && <div style={{ height: 8 }} />}
+
+                    {filterNav(NAV_SYSTEM).map(item => (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+                            title={collapsed ? item.label : undefined}
+                        >
+                            <item.icon size={18} />
+                            {!collapsed && <span>{item.label}</span>}
                         </NavLink>
                     ))}
                 </nav>
 
                 <div className="sidebar-footer">
-                    <div className="user-info">
-                        <div className="user-avatar">
-                            {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    <div className="sidebar-user" title={collapsed ? fullName : undefined}>
+                        <div
+                            className="sidebar-user-avatar"
+                            style={{ background: avatarBg }}
+                        >
+                            {initials}
                         </div>
-                        {sidebarOpen && (
-                            <div className="user-details">
-                                <span className="user-name">{user?.firstName} {user?.lastName}</span>
-                                <span className="user-role">{user?.role?.replace('_', ' ')}</span>
+                        {!collapsed && (
+                            <div className="sidebar-user-info">
+                                <span className="sidebar-user-name">{fullName}</span>
+                                <span className="sidebar-user-role">
+                                    {user?.role?.replace(/_/g, ' ')}
+                                </span>
                             </div>
                         )}
                     </div>
-                    <button className="logout-btn" onClick={handleLogout} title="Logout">
-                        <LogOut size={20} />
-                        {sidebarOpen && <span>Logout</span>}
+
+                    <button
+                        className="sidebar-logout"
+                        onClick={handleLogout}
+                        title={collapsed ? 'Logout' : undefined}
+                    >
+                        <LogOut size={16} />
+                        {!collapsed && <span>Logout</span>}
                     </button>
                 </div>
             </aside>
 
-            {/* Main Content */}
             <main className="main-content">
                 <Outlet />
             </main>

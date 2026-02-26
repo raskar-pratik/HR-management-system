@@ -191,5 +191,7 @@ export const withRetry = async <T>(
 
 // Re-export from centralized toast utility
 export { showToast } from '../utils/toast';
+export const showSuccess = (msg: string) => showToast.success(msg);
+export const showError = (msg: string) => showToast.error(msg);
 
 export default apiClient;

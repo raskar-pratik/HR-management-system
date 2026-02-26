@@ -25,6 +25,7 @@ const ReportsPage = lazy(() => import('./pages/reports/ReportsPage'));
 const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'));
 const AuditLogViewer = lazy(() => import('./components/AuditLogViewer'));
 const PayrollPage = lazy(() => import('./pages/payroll/PayrollPage'));
+const RecruitmentPage = lazy(() => import('./pages/recruitment/RecruitmentPage'));
 
 // Styles
 import './App.css';
@@ -65,6 +66,7 @@ function App() {
                   {/* Manager & HR & Admin Routes */}
                   <Route element={<ProtectedRoute allowedRoles={['super_admin', 'company_admin', 'hr_manager', 'manager']} />}>
                     <Route path="/employees" element={<EmployeesPage />} />
+                    <Route path="/recruitment" element={<RecruitmentPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
                     <Route path="/payroll" element={<PayrollPage />} />
                     <Route path="/departments" element={<DashboardPage />} />

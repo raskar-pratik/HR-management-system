@@ -31,9 +31,6 @@ jest.mock('../store/authStore', () => ({
         selector({ setAuth: mockSetAuth }),
 }));
 
-import api from '../services/api';
-import toast from 'react-hot-toast';
-
 function renderLogin() {
     return render(
         <BrowserRouter>

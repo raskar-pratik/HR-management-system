@@ -8,7 +8,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import {
     Users, Plus, Search, Edit, Trash2,
-    ChevronLeft, ChevronRight, Eye, User, Mail, Calendar
+    ChevronLeft, ChevronRight, Eye, User, Mail, Calendar, Download, MoreHorizontal
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -23,11 +23,46 @@ const employeeSchema = z.object({
 
 type EmployeeFormData = z.infer<typeof employeeSchema>;
 
+const DEPT_COLORS: Record<string, string> = {
+    Engineering: 'badge-blue',
+    Marketing: 'badge-purple',
+    HR: 'badge-green',
+    Finance: 'badge-amber',
+    Sales: 'badge-teal',
+    Operations: 'badge-gray',
+};
+
+const STATUS_COLORS: Record<string, string> = {
+    active: 'badge-green',
+    inactive: 'badge-gray',
+    probation: 'badge-amber',
+    resigned: 'badge-red',
+};
+
+function getAvatarBg(name: string) {
+    const colors = ['#0d968b', '#7c3aed', '#3b82f6', '#10b981', '#f59e0b'];
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+    return colors[Math.abs(h) % colors.length];
+}
+
+function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
+    const initials = name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+    return (
+        <div className={`avatar avatar-${size}`} style={{ background: getAvatarBg(name) }}>
+            {initials}
+        </div>
+    );
+}
+
+const DEPT_FILTERS = ['All', 'Engineering', 'Marketing', 'HR', 'Finance', 'Sales', 'Operations'];
+
 export default function EmployeesPage() {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
+    const [deptFilter, setDeptFilter] = useState('All');
     const [isLoading, setIsLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: string | null }>({ show: false, id: null });
@@ -51,14 +86,10 @@ export default function EmployeesPage() {
         loadEmployees();
     }, [loadEmployees]);
 
-    const handleDeleteClick = (id: string) => {
-        setDeleteModal({ show: true, id });
-    };
+    const handleDeleteClick = (id: string) => setDeleteModal({ show: true, id });
 
     const confirmDelete = async () => {
         if (!deleteModal.id) return;
-        setIsLoading(true); // Re-use main loading or add specific state? specific is better but for now re-use is ok or just modal loading
-        // Actually, Modal has its own isLoading prop
         try {
             await api.deleteEmployee(deleteModal.id);
             toast.success('Employee deactivated');
@@ -67,42 +98,68 @@ export default function EmployeesPage() {
         } catch (error: unknown) {
             const errorMsg = error instanceof Error ? error.message : 'Failed to delete';
             toast.error(errorMsg);
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const totalPages = Math.ceil(total / limit);
+    const startItem = (page - 1) * limit + 1;
+    const endItem = Math.min(page * limit, total);
+
+    const handleExportCSV = async () => {
+        try {
+            await api.exportEmployees();
+        } catch {
+            toast.error('Export failed');
+        }
+    };
 
     return (
-        <div className="employees-page">
+        <div className="page-wrapper">
+            {/* Header */}
             <div className="page-header">
-                <div className="header-left">
-                    <Users size={32} className="page-icon" />
-                    <div>
-                        <h1>Employees</h1>
-                        <p>{total} total employees</p>
-                    </div>
+                <div>
+                    <h1 className="page-title">Employees</h1>
+                    <p className="page-subtitle">{total} team members across all departments</p>
                 </div>
-                <button className="btn-primary" onClick={() => setShowAddModal(true)}>
-                    <Plus size={20} />
-                    Add Employee
-                </button>
+                <div className="page-actions">
+                    <button className="btn btn-secondary" onClick={handleExportCSV}>
+                        <Download size={15} />
+                        Export CSV
+                    </button>
+                    <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+                        <Plus size={15} />
+                        Add Employee
+                    </button>
+                </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="search-bar">
-                <Search size={20} className="search-icon" />
-                <input
-                    type="text"
-                    placeholder="Search employees..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+            {/* Search & Filters */}
+            <div className="search-filter-bar">
+                <div className="search-input-wrapper">
+                    <span className="search-input-icon"><Search size={15} /></span>
+                    <input
+                        type="text"
+                        className="search-input"
+                        placeholder="Search by name, email, role..."
+                        value={search}
+                        onChange={e => { setSearch(e.target.value); setPage(1); }}
+                    />
+                </div>
+                <div className="filter-chips">
+                    {DEPT_FILTERS.map(dept => (
+                        <button
+                            key={dept}
+                            className={`filter-chip${deptFilter === dept ? ' active' : ''}`}
+                            onClick={() => setDeptFilter(dept)}
+                        >
+                            {dept}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {/* Employees Table */}
-            <div className="table-container">
+            {/* Table */}
+            <div className="table-wrapper">
                 {isLoading ? (
                     <EmployeeListSkeleton />
                 ) : employees.length === 0 ? (
@@ -114,83 +171,120 @@ export default function EmployeesPage() {
                         onAction={() => setShowAddModal(true)}
                     />
                 ) : (
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Employee Code</th>
-                                <th>Department</th>
-                                <th>Designation</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {employees.map((emp) => (
-                                <tr key={emp.id}>
-                                    <td>
-                                        <div className="employee-info">
-                                            <div className="avatar">
-                                                {emp.user?.firstName?.[0]}{emp.user?.lastName?.[0]}
-                                            </div>
-                                            <div>
-                                                <strong>{emp.user?.firstName} {emp.user?.lastName}</strong>
-                                                <span>{emp.user?.email}</span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{emp.employeeCode}</td>
-                                    <td>{emp.department?.name || '-'}</td>
-                                    <td>{emp.designation?.name || '-'}</td>
-                                    <td>
-                                        <span className={`status-badge ${emp.employmentStatus}`}>
-                                            {emp.employmentStatus}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="action-buttons">
-                                            <button className="btn-icon" title="View">
-                                                <Eye size={18} />
-                                            </button>
-                                            <button className="btn-icon" title="Edit">
-                                                <Edit size={18} />
-                                            </button>
-                                            <button
-                                                className="btn-icon danger"
-                                                title="Delete"
-                                                onClick={() => handleDeleteClick(emp.id)}
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
+                    <>
+                        <table className="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Join Date</th>
+                                    <th style={{ textAlign: 'right' }}>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {employees.map(emp => {
+                                    const fullName = `${emp.user?.firstName ?? ''} ${emp.user?.lastName ?? ''}`.trim();
+                                    const dept = emp.department?.name ?? '';
+                                    const status = emp.employmentStatus ?? 'active';
+                                    const deptClass = DEPT_COLORS[dept] ?? 'badge-gray';
+                                    const statusClass = STATUS_COLORS[status] ?? 'badge-gray';
+
+                                    return (
+                                        <tr key={emp.id}>
+                                            <td>
+                                                <div className="employee-cell">
+                                                    <Avatar name={fullName || 'U U'} size="md" />
+                                                    <div className="employee-cell-info">
+                                                        <span className="employee-cell-name">{fullName}</span>
+                                                        <span className="employee-cell-email">{emp.user?.email}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {dept ? (
+                                                    <span className={`badge ${deptClass}`}>{dept}</span>
+                                                ) : (
+                                                    <span style={{ color: 'var(--text-light)' }}>—</span>
+                                                )}
+                                            </td>
+                                            <td style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+                                                {emp.designation?.name ?? '—'}
+                                            </td>
+                                            <td>
+                                                <span className={`badge ${statusClass}`}>
+                                                    <span className="badge-dot" />
+                                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                </span>
+                                            </td>
+                                            <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+                                                {emp.joinDate
+                                                    ? new Date(emp.joinDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                                    : '—'
+                                                }
+                                            </td>
+                                            <td>
+                                                <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
+                                                    <button className="btn btn-ghost btn-sm btn-icon-only" title="View">
+                                                        <Eye size={15} />
+                                                    </button>
+                                                    <button className="btn btn-ghost btn-sm btn-icon-only" title="Edit">
+                                                        <Edit size={15} />
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger btn-sm btn-icon-only"
+                                                        title="Deactivate"
+                                                        onClick={() => handleDeleteClick(emp.id)}
+                                                    >
+                                                        <Trash2 size={15} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+
+                        {/* Pagination */}
+                        <div className="pagination">
+                            <span className="pagination-info">
+                                Showing {startItem}–{endItem} of {total} employees
+                            </span>
+                            <div className="pagination-controls">
+                                <button
+                                    className="page-btn"
+                                    onClick={() => setPage(p => p - 1)}
+                                    disabled={page === 1}
+                                >
+                                    <ChevronLeft size={14} />
+                                </button>
+                                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                    const p = i + 1;
+                                    return (
+                                        <button
+                                            key={p}
+                                            className={`page-btn${page === p ? ' active' : ''}`}
+                                            onClick={() => setPage(p)}
+                                        >
+                                            {p}
+                                        </button>
+                                    );
+                                })}
+                                {totalPages > 5 && <span style={{ padding: '0 4px', color: 'var(--text-light)' }}>...</span>}
+                                <button
+                                    className="page-btn"
+                                    onClick={() => setPage(p => p + 1)}
+                                    disabled={page === totalPages || totalPages === 0}
+                                >
+                                    <ChevronRight size={14} />
+                                </button>
+                            </div>
+                        </div>
+                    </>
                 )}
             </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="pagination">
-                    <button
-                        className="btn-page"
-                        onClick={() => setPage(p => p - 1)}
-                        disabled={page === 1}
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-                    <span>Page {page} of {totalPages}</span>
-                    <button
-                        className="btn-page"
-                        onClick={() => setPage(p => p + 1)}
-                        disabled={page === totalPages}
-                    >
-                        <ChevronRight size={20} />
-                    </button>
-                </div>
-            )}
 
             {/* Add Employee Modal */}
             {showAddModal && (
@@ -211,7 +305,7 @@ export default function EmployeesPage() {
                 message="Are you sure you want to deactivate this employee? They will no longer be able to log in."
                 confirmLabel="Deactivate"
                 variant="danger"
-                isLoading={isLoading && !!deleteModal.id}
+                isLoading={false}
             />
         </div>
     );
@@ -235,17 +329,8 @@ function AddEmployeeModal({ onClose, onSuccess }: { onClose: () => void; onSucce
     const onSubmit = async (data: EmployeeFormData) => {
         setIsLoading(true);
         try {
-            // Adapt the data structure to match what the API expects
-            // The API likely expects the same structure as before, or we might need to adjust
-            // Based on previous code: api.createEmployee(formData) where formData was flat
-            // Casting to any because api.createEmployee expects Partial<Employee> which doesn't have flat fields
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await api.createEmployee({
-                firstName: data.firstName,
-                lastName: data.lastName,
-                email: data.email,
-                joinDate: data.joinDate,
-            } as any);
+            await api.createEmployee({ ...data } as any);
             toast.success('Employee added successfully!');
             onSuccess();
         } catch (error: unknown) {
@@ -258,59 +343,53 @@ function AddEmployeeModal({ onClose, onSuccess }: { onClose: () => void; onSucce
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-box" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Add New Employee</h2>
-                    <button className="btn-close" onClick={onClose}>&times;</button>
+                    <span className="modal-title">Add New Employee</span>
+                    <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
                 <FormProvider {...methods}>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="form-row">
+                        <div className="modal-body">
+                            <div className="form-row">
+                                <FormInput
+                                    label="First Name"
+                                    name="firstName"
+                                    placeholder="Jane"
+                                    icon={<User size={14} />}
+                                />
+                                <FormInput
+                                    label="Last Name"
+                                    name="lastName"
+                                    placeholder="Doe"
+                                    icon={<User size={14} />}
+                                />
+                            </div>
                             <FormInput
-                                label="First Name"
-                                name="firstName"
-                                placeholder="John"
-                                icon={<User size={16} />}
+                                label="Email Address"
+                                name="email"
+                                type="email"
+                                placeholder="jane.doe@company.com"
+                                icon={<Mail size={14} />}
                             />
                             <FormInput
-                                label="Last Name"
-                                name="lastName"
-                                placeholder="Doe"
-                                icon={<User size={16} />}
+                                label="Join Date"
+                                name="joinDate"
+                                type="date"
+                                icon={<Calendar size={14} />}
                             />
                         </div>
 
-                        <FormInput
-                            label="Email"
-                            name="email"
-                            type="email"
-                            placeholder="john.doe@company.com"
-                            icon={<Mail size={16} />}
-                        />
-
-                        <FormInput
-                            label="Join Date"
-                            name="joinDate"
-                            type="date"
-                            icon={<Calendar size={16} />}
-                        />
-
-                        <div className="modal-actions">
-                            <button type="button" className="btn-secondary" onClick={onClose}>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
                                 Cancel
                             </button>
-                            <button type="submit" className="btn-primary" disabled={isLoading}>
+                            <button type="submit" className="btn btn-primary" disabled={isLoading}>
                                 {isLoading ? (
-                                    <>
-                                        <div className="spinner-small mr-2"></div>
-                                        Adding...
-                                    </>
+                                    <><span className="spinner" style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%' }} /> Adding...</>
                                 ) : (
-                                    <>
-                                        <Plus size={16} className="mr-2" />
-                                        Add Employee
-                                    </>
+                                    <><Plus size={14} /> Add Employee</>
                                 )}
                             </button>
                         </div>

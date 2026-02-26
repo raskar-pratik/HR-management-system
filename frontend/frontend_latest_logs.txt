@@ -1,0 +1,201 @@
+Starting Container
+ INFO  Accepting connections at http://localhost:8080
+npm warn config production Use `--omit=dev` instead.
+
+> frontend@0.0.0 start
+> serve -s dist -l $PORT
+
+ HTTP  2/25/2026 7:00:54 AM 100.64.0.2 GET /
+ HTTP  2/25/2026 7:00:54 AM 100.64.0.2 Returned 200 in 10 ms
+ HTTP  2/25/2026 7:00:54 AM 100.64.0.2 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 7:00:54 AM 100.64.0.2 Returned 200 in 3 ms
+ HTTP  2/25/2026 7:00:54 AM 100.64.0.2 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 7:00:54 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /vite.svg
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 3 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 4 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 2 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 200 in 3 ms
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 GET /vite.svg
+ HTTP  2/25/2026 7:00:56 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:01:29 AM 100.64.0.2 GET /assets/briefcase-C0Ep2QxT.js
+ HTTP  2/25/2026 7:01:29 AM 100.64.0.2 GET /assets/RegisterPage-Dh7oUr4D.js
+ HTTP  2/25/2026 7:01:29 AM 100.64.0.2 GET /assets/user-LFyc9WNH.js
+ HTTP  2/25/2026 7:01:29 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:01:29 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:01:29 AM 100.64.0.2 Returned 200 in 2 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:47 AM 100.64.0.2 GET /login
+ HTTP  2/25/2026 7:02:47 AM 100.64.0.2 Returned 200 in 1 ms
+ HTTP  2/25/2026 7:02:47 AM 100.64.0.2 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 7:02:47 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:02:47 AM 100.64.0.2 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 7:02:47 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /vite.svg
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 GET /vite.svg
+ HTTP  2/25/2026 7:02:48 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:03:15 AM 100.64.0.2 GET /assets/RegisterPage-Dh7oUr4D.js
+ HTTP  2/25/2026 7:03:15 AM 100.64.0.2 GET /assets/user-LFyc9WNH.js
+ HTTP  2/25/2026 7:03:15 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:03:15 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:03:15 AM 100.64.0.2 GET /assets/briefcase-C0Ep2QxT.js
+ HTTP  2/25/2026 7:03:15 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:04:26 AM 100.64.0.3 HEAD /
+ HTTP  2/25/2026 7:04:26 AM 100.64.0.3 Returned 200 in 0 ms
+ HTTP  2/25/2026 7:10:46 AM 100.64.0.4 GET /
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:10:46 AM 100.64.0.4 Returned 200 in 3 ms
+ HTTP  2/25/2026 7:10:46 AM 100.64.0.4 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 7:10:46 AM 100.64.0.4 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 7:10:46 AM 100.64.0.4 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:10:46 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /vite.svg
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 7:10:47 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:11:25 AM 100.64.0.4 GET /assets/RegisterPage-Dh7oUr4D.js
+ HTTP  2/25/2026 7:11:25 AM 100.64.0.4 GET /assets/user-LFyc9WNH.js
+ HTTP  2/25/2026 7:11:25 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:11:25 AM 100.64.0.4 GET /assets/briefcase-C0Ep2QxT.js
+ HTTP  2/25/2026 7:11:25 AM 100.64.0.4 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:11:25 AM 100.64.0.4 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:29 AM 100.64.0.5 GET /register
+ HTTP  2/25/2026 7:12:29 AM 100.64.0.5 Returned 200 in 0 ms
+ HTTP  2/25/2026 7:12:30 AM 100.64.0.5 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 7:12:30 AM 100.64.0.5 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:12:30 AM 100.64.0.5 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 7:12:30 AM 100.64.0.5 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:30 AM 100.64.0.5 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 7:12:30 AM 100.64.0.5 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /vite.svg
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/user-LFyc9WNH.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/RegisterPage-Dh7oUr4D.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /assets/briefcase-C0Ep2QxT.js
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:12:31 AM 100.64.0.5 GET /vite.svg
+ HTTP  2/25/2026 7:18:27 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:18:28 AM 100.64.0.2 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 7:18:28 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:18:28 AM 100.64.0.2 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 7:18:28 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /vite.svg
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 7:18:27 AM 100.64.0.2 GET /
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 1 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 7:18:29 AM 100.64.0.2 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:27 PM 100.64.0.6 GET /login
+ HTTP  2/25/2026 4:54:27 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:28 PM 100.64.0.6 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 4:54:28 PM 100.64.0.6 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:54:28 PM 100.64.0.6 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 4:54:28 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /vite.svg
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 GET /vite.svg
+ HTTP  2/25/2026 4:54:29 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:55:48 PM 100.64.0.6 GET /
+ HTTP  2/25/2026 4:55:48 PM 100.64.0.6 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:55:48 PM 100.64.0.6 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 4:55:48 PM 100.64.0.6 Returned 200 in 2 ms
+ HTTP  2/25/2026 4:55:48 PM 100.64.0.6 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 4:55:48 PM 100.64.0.6 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /vite.svg
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 0 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 0 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 0 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 GET /vite.svg
+ HTTP  2/25/2026 4:55:50 PM 100.64.0.6 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:59:37 PM 100.64.0.7 GET /login
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/schemas-BCsSE572.js
+ HTTP  2/25/2026 4:59:37 PM 100.64.0.7 Returned 200 in 1 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/circle-alert-CMEhU2Cg.js
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:59:37 PM 100.64.0.7 GET /assets/index-CwxqPDnX.css
+ HTTP  2/25/2026 4:59:37 PM 100.64.0.7 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/lock-CmJbds0M.js
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/FormInput-DzBcMBM-.js
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/index-BTUDeJy1.js
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/api-BYg3RXnM.js
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 0 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 1 ms
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /vite.svg
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 GET /assets/LoginPage-DC--eSDY.js
+ HTTP  2/25/2026 4:59:38 PM 100.64.0.7 Returned 304 in 0 ms
