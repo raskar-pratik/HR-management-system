@@ -40,7 +40,7 @@ const NETWORK_ERRORS: Record<string, string> = {
 
 // Create axios instance with defaults
 const apiClient: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
+    baseURL: import.meta.env.VITE_API_URL || 'https://backend-production-d8f7.up.railway.app/api/v1',
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',

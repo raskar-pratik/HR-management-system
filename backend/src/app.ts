@@ -38,7 +38,7 @@ app.use(mongoSanitize());
 app.use(xss());
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://peopleoshr.vercel.app'],
     credentials: true
 }));
 
