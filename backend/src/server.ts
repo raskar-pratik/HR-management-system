@@ -22,11 +22,9 @@ const startServer = async (): Promise<void> => {
             process.exit(1);
         }
 
-        // Force sync for fresh PostgreSQL setup (cleans up partial state from failed deploys)
-        const syncOptions = process.env.FORCE_DB_SYNC === 'true' 
-            ? { force: true } 
-            : { alter: process.env.NODE_ENV === 'development' };
-        await sequelize.sync(syncOptions);
+        // Sync database models
+        const forceSync = process.env.FORCE_DB_SYNC === 'true';
+        await sequelize.sync({ force: forceSync });
         console.log('✅ Database models synchronized.');
 
         // Start Express server
