@@ -9,11 +9,15 @@ let sequelize: Sequelize;
 
 if (process.env.DATABASE_URL) {
     // Production: Use DATABASE_URL from Render (PostgreSQL)
+    const isExternalDB = process.env.DATABASE_URL.includes('amazonaws.com') || 
+                         process.env.DATABASE_URL.includes('neon.tech') ||
+                         process.env.DATABASE_URL.includes('supabase');
+    
     sequelize = new Sequelize(process.env.DATABASE_URL, {
         dialect: 'postgres',
         logging: process.env.NODE_ENV === 'development' ? console.log : false,
         pool: {
-            max: 10,
+            max: 5,
             min: 0,
             acquire: 30000,
             idle: 10000
@@ -23,12 +27,12 @@ if (process.env.DATABASE_URL) {
             underscored: true,
             freezeTableName: true
         },
-        dialectOptions: {
+        dialectOptions: isExternalDB ? {
             ssl: {
                 require: true,
                 rejectUnauthorized: false
             }
-        }
+        } : {}
     });
 } else {
     // Local development: Use individual env vars (MySQL)
