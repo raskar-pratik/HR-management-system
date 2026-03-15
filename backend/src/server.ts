@@ -1,5 +1,5 @@
 import app from './app';
-import sequelize, { testConnection } from './config/database';
+import sequelize, { testConnection, resetPostgresSchema } from './config/database';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -24,7 +24,22 @@ const startServer = async (): Promise<void> => {
 
         // Sync database models
         const forceSync = process.env.FORCE_DB_SYNC === 'true';
-        await sequelize.sync({ force: forceSync });
+        
+        if (forceSync) {
+            console.log('🔄 FORCE_DB_SYNC enabled - performing nuclear schema reset...');
+            await resetPostgresSchema();
+        }
+        
+        try {
+            await sequelize.sync({ force: forceSync });
+            console.log('✅ Database models synchronized.');
+        } catch (syncError: any) {
+            console.error('❌ FULL SYNC ERROR:', JSON.stringify(syncError, null, 2));
+            console.error('❌ Error message:', syncError?.message);
+            console.error('❌ Original error:', syncError?.original);
+            console.error('❌ SQL:', syncError?.sql);
+            throw syncError;
+        }
         console.log('✅ Database models synchronized.');
 
         // Start Express server

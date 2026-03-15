@@ -1,3 +1,9 @@
+databases:
+  - name: hr-management-db
+    plan: free
+    databaseName: hr_management_db
+    user: hr_admin
+
 services:
   - type: web
     name: hr-backend
@@ -9,13 +15,15 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hr-management-db
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
       - key: PORT
         value: 10000
-      - key: DB_SSL
-        value: true
       - key: FORCE_DB_SYNC
         value: true
