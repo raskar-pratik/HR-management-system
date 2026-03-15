@@ -125,10 +125,11 @@ Payslip.init(
         sequelize,
         tableName: 'payslips',
         timestamps: true,
+        underscored: true,
         indexes: [
             {
                 unique: true,
-                fields: ['payrollRunId', 'employeeId'],
+                fields: ['payroll_run_id', 'employee_id'],
             },
         ],
     }

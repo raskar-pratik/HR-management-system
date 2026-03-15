@@ -76,10 +76,11 @@ SalaryComponent.init(
         sequelize,
         tableName: 'salary_components',
         timestamps: true,
+        underscored: true,
         indexes: [
             {
                 unique: true,
-                fields: ['companyId', 'code'],
+                fields: ['company_id', 'code'],
             },
         ],
     }

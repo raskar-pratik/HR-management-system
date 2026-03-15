@@ -57,6 +57,7 @@ SalaryStructure.init(
         sequelize,
         tableName: 'salary_structures',
         timestamps: true,
+        underscored: true,
     }
 );
 

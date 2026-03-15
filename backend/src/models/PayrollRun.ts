@@ -92,10 +92,11 @@ PayrollRun.init(
         sequelize,
         tableName: 'payroll_runs',
         timestamps: true,
+        underscored: true,
         indexes: [
             {
                 unique: true,
-                fields: ['companyId', 'month', 'year'],
+                fields: ['company_id', 'month', 'year'],
             },
         ],
     }
