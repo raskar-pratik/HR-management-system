@@ -27,6 +27,7 @@ import { apiLimiter, authLimiter } from './middleware/rateLimit.middleware';
 
 // Create Express app
 const app: Application = express();
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet()); // Set security HTTP headers
@@ -38,7 +39,7 @@ app.use(mongoSanitize());
 app.use(xss());
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://peopleoshr.vercel.app'],
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://peopleoshr.vercel.app', 'https://hr-backend-0ate.onrender.com'],
     credentials: true
 }));
 
